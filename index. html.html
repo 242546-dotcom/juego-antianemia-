@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriGestión: 10 Juegos Antianemia (Personal y Multijugador)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: radial-gradient(circle at top left, #fff0f5 0%, #fce7f3 35%, #fff7ed 70%, #f0fdf4 100%);
+            min-height: 100vh;
+        }
+        .font-game { font-family: 'Fredoka', cursive, sans-serif; }
+        
+        .bg-gradient-header { background: linear-gradient(135deg, #fb7185 0%, #f472b6 40%, #fbbf24 100%); }
+        .bg-gradient-hero { background: linear-gradient(135deg, #fda4af 0%, #f472b6 45%, #c084fc 100%); }
+        .bg-gradient-myth { background: linear-gradient(135deg, #a855f7 0%, #818cf8 100%); }
+        
+        .bounce-hover {
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-color: #fbcfe8;
+        }
+        .bounce-hover:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 20px 30px -5px rgba(244, 63, 94, 0.2);
+            border-color: #f43f5e;
+        }
+
+        .floating-heart {
+            animation: floatAnim 3.5s ease-in-out infinite alternate;
+        }
+        @keyframes floatAnim {
+            0% { transform: translateY(0px) rotate(0deg); }
+            100% { transform: translateY(-8px) rotate(6deg); }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fce7f3; }
+        ::-webkit-scrollbar-thumb { background: #fb7185; border-radius: 9999px; }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col min-h-screen selection:bg-rose-400 selection:text-white">
+
+    <!-- HEADER -->
+    <header class="bg-gradient-header text-white shadow-xl sticky top-0 z-40 border-b-4 border-amber-200">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center flex-wrap gap-2">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="showDashboard()">
+                <div class="bg-white/90 text-rose-500 p-2.5 rounded-2xl shadow-lg transform -rotate-6 floating-heart">
+                    <i class="fa-solid fa-heart-pulse text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-game text-xl md:text-2xl font-bold tracking-wide drop-shadow-md flex items-center gap-2">
+                        NutriGestión <span class="bg-amber-300 text-rose-950 text-[10px] md:text-xs px-2.5 py-0.5 rounded-full uppercase tracking-wider font-extrabold">🌸 Gestacional</span>
+                    </h1>
+                    <p class="text-[11px] text-rose-100 font-semibold hidden sm:block">10 Juegos de Nutrición • Modo Personal y Multijugador</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <!-- Profile / Multiplayer Trigger Badge -->
+                <button onclick="openModeConfigModal()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-2xl font-game text-xs font-bold backdrop-blur border border-white/40 transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <span id="header-mode-icon">👤</span>
+                    <span id="header-mode-text">Personal</span>
+                </button>
+
+                <button onclick="toggleMythGallery()" class="bg-amber-300 hover:bg-amber-200 text-amber-950 px-3 py-1.5 rounded-2xl font-game text-xs font-bold shadow-md transition flex items-center gap-1 active:scale-95 border border-amber-100">
+                    <i class="fa-solid fa-wand-magic-sparkles text-rose-600"></i>
+                    <span class="hidden sm:inline">Mitos</span>
+                </button>
+                <button onclick="showDashboard()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-2xl font-game text-xs font-bold backdrop-blur border border-white/40 transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <i class="fa-solid fa-house"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6">
+        
+        <!-- DASHBOARD / GAME MENU SCREEN -->
+        <div id="dashboard-screen" class="space-y-6">
+            
+            <!-- Hero Banner & Mode Switcher -->
+            <div class="bg-gradient-hero rounded-3xl p-6 md:p-8 text-white shadow-2xl relative overflow-hidden border-4 border-white/80">
+                <div class="absolute -right-6 -bottom-6 opacity-20 text-9xl font-bold select-none pointer-events-none">💖</div>
+                <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div class="space-y-3 max-w-2xl">
+                        <div class="inline-flex items-center gap-2 bg-white/25 backdrop-blur px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-white/40 text-white">
+                            <span>✨</span> Diversión Educativa Prenatal
+                        </div>
+                        <h2 class="font-game text-2xl md:text-4xl font-extrabold leading-tight drop-shadow-sm">
+                            Centro Lúdico Antianemia Gestacional
+                        </h2>
+                        <p class="text-rose-50 text-xs md:text-sm font-medium leading-relaxed">
+                            Aprende a proteger tu salud de forma individual o compite sanamente con otras mamás y familiares en talleres de nutrición.
+                        </p>
+                    </div>
+
+                    <!-- Active Mode Status Box -->
+                    <div class="bg-white/95 backdrop-blur text-slate-800 p-4 rounded-2xl border-2 border-rose-300 shadow-xl w-full md:w-auto min-w-[240px] space-y-2 text-center">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-rose-500 font-game block">Modo Activo Actual</span>
+                        <div class="flex items-center justify-center gap-2">
+                            <span id="dash-mode-avatar" class="text-2xl">🤰</span>
+                            <div class="text-left">
+                                <h4 id="dash-mode-title" class="font-game font-bold text-sm text-slate-900">Modo Personal</h4>
+                                <p id="dash-mode-subtitle" class="text-[11px] text-slate-600 font-semibold">Jugador: María (Semana 24)</p>
+                            </div>
+                        </div>
+                        <button onclick="openModeConfigModal()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-game text-xs font-bold py-2 rounded-xl transition shadow-sm active:scale-95">
+                            ⚙️ Cambiar Modo o Participantes
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MYTHS BANNER TOGGLE SECTION -->
+            <div id="myth-gallery" class="hidden bg-purple-900/95 backdrop-blur text-white p-5 rounded-3xl border-4 border-purple-300 shadow-2xl space-y-4">
+                <div class="flex justify-between items-center border-b border-purple-700/80 pb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">🌸</span>
+                        <div>
+                            <h3 class="font-game text-lg font-bold text-amber-300">Cazador de Mitos Nutritivos</h3>
+                            <p class="text-[11px] text-purple-200">Aprende la verdad detrás de las falsas creencias sobre la gestación.</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleMythGallery()" class="text-purple-300 hover:text-white font-bold p-1">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="myth-cards-container">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- GAME GRID (10 GAMES) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                
+                <!-- Game 1 -->
+                <div class="bounce-hover bg-white rounded-3xl p-5 border-2 border-rose-200 shadow-xl flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-rose-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl font-game">PUZZLE</div>
+                    <div>
+                        <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-inner">🧩</div>
+                        <h3 class="font-game text-lg font-bold text-slate-800">1. Rompecabezas Nutritivo</h3>
+                        <p class="text-xs text-slate-600 mt-1">Arma el plato rico en hierro hemo y vitamina C individualmente o a contrarreloj en grupo.</p>
+                    </div>
+                    <button onclick="openGameIntro('puzzle')" class="mt-4 w-full bg-rose-500 hover:bg-rose-600 text-white font-game font-bold py-2.5 rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-play"></i> Jugar
+                    </button>
+                </div>
+
+                <!-- Game 2 -->
+                <div class="bounce-hover bg-white rounded-3xl p-5 border-2 border-indigo-200 shadow-xl flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-indigo-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl font-game">TABLERO</div>
+                    <div>
+                        <div class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-3xl mb-3 shadow-inner">🎲</div>
+                        <h3 class="font-game text-lg font-bold text-slate-800">2. Ludo de la Gestación</h3>
+                        <p class="text-xs text-slate-600 mt-1">Recorre el embarazo por semanas. ¡Soporta de 1 a 4 participantes con sus fichas!</p>
+                    </div>
+                    <button onclick="openGameIntro('ludo')" class="mt-4 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-game font-bold py-2.5 rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-play"></i> Jugar
+                    </button>
+                </div>
+
+                <!-- Game 3 -->
+                <div class="bounce-hover bg-white rounded-3xl p-5 border-2 border-amber-200 shadow-xl flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-amber-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl font-game">BLOQUES</div>
+                    <div>
+                        <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-inner">🧊</div>
+                        <h3 class="font-game text-lg font-bold text-slate-800">3. Nutri-Bloques Combo</h3>
+                        <p class="text-xs text-slate-600 mt-1">Combina bloques de hierro y vitamina C para subir tu hemoglobina o competir en puntos.</p>
+                    </div>
+                    <button onclick="openGameIntro('blocks')" class="mt-4 w-full bg-amber-500 hover:bg-amber-600 text-white font-game font-bold py-2.5 rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-play"></i> Jugar
+                    </button>
+                </div>
+
+                <!-- Game 4 -->
+                <div class="bounce-hover bg-white rounded-3xl p-5 border-2 border-emerald-200 shadow-xl flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl font-game">ESTRATEGIA</div>
+                    <div>
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-inner">🥦</div>
+                        <h3 class="font-game text-lg font-bold text-slate-800">4. Alimentos vs. Anemia</h3>
+                        <p class="text-xs text-slate-600 mt-1">Ubica defensores nutritivos para derrotar las oleadas de fatiga y mitos.</p>
+                    </div>
+                    <button onclick="openGameIntro('pvz')" class="mt-4 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-game font-bold py-2.5 rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-play"></i> Jugar
+                    </button>
+                </div>
+
+                <!-- Game 5 -->
+                <div class="bounce-hover bg-white rounded-3xl p-5 border-2 border-blue-200 shadow-xl flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-blue-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl font-game">CARRERAS</div>
+                    <div>
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-inner">🏎️</div>
+                        <h3 class="font-game text-lg font-bold text-slate-800">5. Rally Hemoglobina</h3>
+                        <p class="text-xs text-slate-600 mt-1">Maneja recolectando cápsulas de hierro. ¡Puntaje individual y ranking de grupo!</p>
+                    </div>
+                    <button onclick="openGameIntro('cars')" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-game font-bold py-2.5 rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-play"></i> Jugar
+                    </button>
+                </div>
+
+                <!-- Game 6 -->
+                <div class="bounce-hover bg-white rounded-3xl p-5 border-2 border-orange-200 shadow-xl flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-orange-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl font-game">COCINA</div>
+                    <div>
+                        <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-inner">🍳</div>
+                        <h3 class="font-game text-lg font-bold text-slate-800">6. Chef Materna Express</h3>
+                        <p class="text-xs text-slate-600 mt-1">Sirve menús nutritivos. En grupo, cada participante atiende un pedido por turno.</p>
+                    </div>
+                    <button onclick="openGameIntro('kitchen')" class="mt-4 w-full bg-orange-500 hover:bg-orange-600 text-white font-game font-bold py-2.5 rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-play"></i> Jugar
+                    </button>
+                </div>
+
+                <!-- Game 7 -->
+                <div class="bounce-hover bg-white rounded-3xl p-5 border-2 border-purple-200 shadow-xl flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-purple-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl font-game">MEMORIA</div>
+                    <div>
+                        <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-inner">🧠</div>
+                        <h3 class="font-game text-lg font-bold text-slate-800">7. Memoria Mitos vs. Verdad</h3>
+                        <p class="text-xs text-slate-600 mt-1">Empareja el mito con su verdad. En multijugador se anotan pares por turno.</p>
+                    </div>
+                    <button onclick="openGameIntro('memory')" class="mt-4 w-full bg-purple-500 hover:bg-purple-600 text-white font-game font-bold py-2.5 rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-play"></i> Jugar
+                    </button>
+                </div>
+
+                <!-- Game 8 -->
+                <div class="bounce-hover bg-white rounded-3xl p-5 border-2 border-cyan-200 shadow-xl flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-cyan-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl font-game">TRIVIA</div>
+                    <div>
+                        <div class="w-12 h-12 bg-cyan-100 text-cyan-600 rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-inner">❓</div>
+                        <h3 class="font-game text-lg font-bold text-slate-800">8. Desafío Trivia Mitos</h3>
+                        <p class="text-xs text-slate-600 mt-1">Responde preguntas de nutrición en rondas personales o competitivas de grupo.</p>
+                    </div>
+                    <button onclick="openGameIntro('trivia')" class="mt-4 w-full bg-cyan-500 hover:bg-cyan-600 text-white font-game font-bold py-2.5 rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-play"></i> Jugar
+                    </button>
+                </div>
+
+                <!-- Game 9 -->
+                <div class="bounce-hover bg-white rounded-3xl p-5 border-2 border-teal-200 shadow-xl flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-teal-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl font-game">PLATAFORMAS</div>
+                    <div>
+                        <div class="w-12 h-12 bg-teal-100 text-teal-600 rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-inner">🏃‍♀️</div>
+                        <h3 class="font-game text-lg font-bold text-slate-800">9. Super Mamá Antianemia</h3>
+                        <p class="text-xs text-slate-600 mt-1">Salta sobre obstáculos recolectando cápsulas rojas de hierro.</p>
+                    </div>
+                    <button onclick="openGameIntro('platformer')" class="mt-4 w-full bg-teal-500 hover:bg-teal-600 text-white font-game font-bold py-2.5 rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-play"></i> Jugar
+                    </button>
+                </div>
+
+                <!-- Game 10 -->
+                <div class="bounce-hover bg-white rounded-3xl p-5 border-2 border-pink-200 shadow-xl flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-pink-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl font-game">ESCALERA</div>
+                    <div>
+                        <div class="w-12 h-12 bg-pink-100 text-pink-600 rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-inner">🪜</div>
+                        <h3 class="font-game text-lg font-bold text-slate-800">10. Escalera del Hierro</h3>
+                        <p class="text-xs text-slate-600 mt-1">Sube escaleras de buena nutrición. ¡Multijugador ideal para talleres familiares!</p>
+                    </div>
+                    <button onclick="openGameIntro('snakes')" class="mt-4 w-full bg-pink-500 hover:bg-pink-600 text-white font-game font-bold py-2.5 rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-play"></i> Jugar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- MODE CONFIGURATION MODAL (PERSONAL VS MULTIPLAYER) -->
+        <div id="mode-config-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border-4 border-rose-300 overflow-hidden flex flex-col max-h-[90vh]">
+                
+                <div class="bg-gradient-to-r from-rose-500 to-amber-500 p-5 text-white flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">⚙️</span>
+                        <div>
+                            <h3 class="font-game text-xl font-bold">Configuración de Juego</h3>
+                            <p class="text-xs text-rose-100">Elige el modo Personal o Multijugador</p>
+                        </div>
+                    </div>
+                    <button onclick="closeModeConfigModal()" class="bg-black/20 text-white w-8 h-8 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="p-5 space-y-5 overflow-y-auto">
+                    <!-- Mode Tabs -->
+                    <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-2xl">
+                        <button onclick="switchModeTab('personal')" id="tab-btn-personal" class="py-2.5 rounded-xl font-game text-xs font-bold transition bg-white text-rose-600 shadow-sm">
+                            👤 Personal
+                        </button>
+                        <button onclick="switchModeTab('multi')" id="tab-btn-multi" class="py-2.5 rounded-xl font-game text-xs font-bold transition text-slate-600">
+                            👥 Multijugador
+                        </button>
+                    </div>
+
+                    <!-- Personal Tab Content -->
+                    <div id="tab-content-personal" class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="font-game text-xs font-bold text-slate-700 block">Nombre de la Gestante:</label>
+                            <input type="text" id="input-player-name" value="María" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold focus:border-rose-400 outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="font-game text-xs font-bold text-slate-700 block">Semana de Gestación:</label>
+                            <input type="number" id="input-player-week" value="24" min="1" max="40" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold focus:border-rose-400 outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="font-game text-xs font-bold text-slate-700 block">Elige tu Avatar Maternal:</label>
+                            <div class="flex gap-3 justify-center">
+                                <button onclick="selectAvatar('🤰')" class="avatar-btn text-2xl p-2 bg-rose-50 border-2 border-rose-300 rounded-2xl">🤰</button>
+                                <button onclick="selectAvatar('🌸')" class="avatar-btn text-2xl p-2 bg-slate-100 border-2 border-slate-200 rounded-2xl">🌸</button>
+                                <button onclick="selectAvatar('💖')" class="avatar-btn text-2xl p-2 bg-slate-100 border-2 border-slate-200 rounded-2xl">💖</button>
+                                <button onclick="selectAvatar('🐣')" class="avatar-btn text-2xl p-2 bg-slate-100 border-2 border-slate-200 rounded-2xl">🐣</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Multiplayer Tab Content -->
+                    <div id="tab-content-multi" class="space-y-4 hidden">
+                        <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-3 text-xs text-indigo-900 leading-relaxed">
+                            💡 <strong>Ideal para Talleres de Salud:</strong> Agrega hasta 4 participantes para jugar en el mismo dispositivo por turnos o sincronizar salas virtuales.
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="font-game text-xs font-bold text-slate-700 block">Participantes del Grupo (2 a 4):</label>
+                            <div id="multi-players-list" class="space-y-2">
+                                <input type="text" class="multi-name-input w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-2 text-xs font-bold" value="Mamá María (🤰)">
+                                <input type="text" class="multi-name-input w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-2 text-xs font-bold" value="Mamá Sofía (🌸)">
+                            </div>
+                            <button onclick="addMultiPlayerInput()" class="text-xs font-game font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 mt-1">
+                                <i class="fa-solid fa-plus-circle"></i> Agregar Participante
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="p-4 bg-slate-50 border-t border-slate-200">
+                    <button onclick="saveModeConfig()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-game font-bold py-3 rounded-2xl shadow-lg transition text-sm">
+                        💾 Guardar y Aplicar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- GAME INTRO MODAL -->
+        <div id="game-intro-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border-4 border-amber-300 overflow-hidden flex flex-col max-h-[90vh]">
+                
+                <div id="intro-modal-header" class="bg-gradient-to-r from-rose-500 to-amber-500 p-5 text-white relative">
+                    <button onclick="closeGameIntroModal()" class="absolute top-4 right-4 bg-black/20 text-white w-8 h-8 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <div class="flex items-center gap-4">
+                        <div id="intro-icon" class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/30">🎮</div>
+                        <div>
+                            <span id="intro-badge" class="bg-amber-300 text-rose-950 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full font-game uppercase">Misión Divertida</span>
+                            <h3 id="intro-title" class="font-game text-xl font-bold text-white mt-0.5">Título del Juego</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-5 space-y-4 overflow-y-auto text-slate-700">
+                    <div class="bg-rose-50 border border-rose-200 rounded-2xl p-3.5 flex items-start gap-3 text-xs">
+                        <span class="text-xl">📖</span>
+                        <div>
+                            <h4 class="font-game font-bold text-rose-900">Historia de la Misión:</h4>
+                            <p id="intro-lore" class="text-rose-800 mt-0.5 leading-relaxed">El villano Cansancio quiere bajar tu energía. ¡Activa tus nutrientes!</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-myth text-white rounded-2xl p-3.5 space-y-1.5 shadow-md">
+                        <div class="flex items-center gap-1.5 text-amber-300 font-game text-xs font-bold uppercase">
+                            <i class="fa-solid fa-lightbulb"></i> Mito a Desmentir:
+                        </div>
+                        <p id="intro-myth-question" class="text-xs font-semibold text-purple-100">"Mito: Las embarazadas deben comer por dos."</p>
+                        <div class="bg-white/10 p-2 rounded-xl text-[11px]">
+                            <strong class="text-amber-300 block">Verdad Científica:</strong>
+                            <span id="intro-myth-answer">Comer dos veces MEJOR, priorizando el hierro.</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="font-game text-xs font-bold text-slate-800 block text-center">⚡ Dificultad:</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="selectDifficulty('easy')" id="diff-btn-easy" class="diff-btn border-2 border-emerald-400 bg-emerald-50 text-emerald-800 p-2 rounded-xl font-game text-xs font-bold flex flex-col items-center">
+                                <span>🟢 Fácil</span>
+                            </button>
+                            <button onclick="selectDifficulty('medium')" id="diff-btn-medium" class="diff-btn border-2 border-amber-400 bg-amber-50 text-amber-800 p-2 rounded-xl font-game text-xs font-bold flex flex-col items-center">
+                                <span>🟡 Intermedio</span>
+                            </button>
+                            <button onclick="selectDifficulty('hard')" id="diff-btn-hard" class="diff-btn border-2 border-rose-400 bg-rose-50 text-rose-800 p-2 rounded-xl font-game text-xs font-bold flex flex-col items-center">
+                                <span>🔴 Difícil</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 border-t border-slate-200">
+                    <button onclick="confirmLaunchGame()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-game font-bold py-3 rounded-2xl shadow-lg transition text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> ¡Comenzar Misión!
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- GAME DISPLAY SCREEN -->
+        <div id="game-screen" class="hidden space-y-4">
+            
+            <div class="bg-white p-4 rounded-3xl border-2 border-slate-200 shadow-md flex flex-col md:flex-row justify-between items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <div id="game-icon-badge" class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-2xl font-bold shadow-inner">🎮</div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 id="current-game-title" class="font-game text-lg font-bold text-slate-800">Título</h2>
+                            <span id="difficulty-badge" class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full font-game">🟢 Fácil</span>
+                        </div>
+                        <p id="current-game-desc" class="text-xs text-slate-500">Descripción educacional.</p>
+                    </div>
+                </div>
+
+                <!-- Turn / Player Status Bar in Game -->
+                <div id="game-active-player-banner" class="bg-rose-50 border border-rose-200 text-rose-900 px-3.5 py-1.5 rounded-2xl text-xs font-bold font-game flex items-center gap-2">
+                    <span id="active-player-avatar">🤰</span>
+                    <span id="active-player-name">Jugadora: María</span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="openGameIntro(selectedGameKey)" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-3 py-1.5 rounded-xl text-xs font-bold border border-amber-300">
+                        <i class="fa-solid fa-sliders"></i> Dificultad
+                    </button>
+                    <button onclick="showDashboard()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-300">
+                        <i class="fa-solid fa-house"></i> Menú
+                    </button>
+                </div>
+            </div>
+
+            <div id="game-container" class="bg-white rounded-3xl p-4 md:p-6 border-2 border-slate-200 shadow-lg flex flex-col items-center justify-center min-h-[460px] relative overflow-hidden">
+                <!-- Injected via JavaScript -->
+            </div>
+
+            <div id="educational-tip" class="bg-gradient-to-r from-amber-50 via-rose-50 to-purple-50 border-2 border-amber-200 rounded-2xl p-3.5 text-slate-800 text-xs flex items-start gap-3 shadow-sm">
+                <div class="bg-amber-400 text-amber-950 p-2 rounded-xl text-lg font-bold shadow-sm">💡</div>
+                <div>
+                    <strong class="font-game text-amber-950 block">Dato Clave de Salud Materna:</strong>
+                    <span id="tip-text" class="text-slate-700 font-medium">El hierro de origen animal se absorbe directamente en la sangre.</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 py-4 text-center text-xs mt-auto border-t-4 border-rose-500">
+        <p class="font-medium">NutriGestión © 2026 - Plataforma Educativa e Interactiva para Gestantes.</p>
+    </footer>
+
+    <script>
+        // Web Audio Synth
+        const SoundFX = {
+            ctx: null,
+            init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+            playBeep(freq = 440, type = 'sine', duration = 0.1) {
+                try {
+                    this.init();
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    osc.start(); osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
+            },
+            playWin() {
+                this.playBeep(523, 'triangle', 0.12);
+                setTimeout(() => this.playBeep(659, 'triangle', 0.12), 100);
+                setTimeout(() => this.playBeep(783, 'triangle', 0.25), 200);
+            },
+            playError() {
+                this.playBeep(220, 'sawtooth', 0.15);
+                setTimeout(() => this.playBeep(180, 'sawtooth', 0.2), 120);
+            }
+        };
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
+        }
+
+        // PLAYER & MULTIPLAYER STATE
+        let modeType = 'personal'; // 'personal' | 'multi'
+        let personalPlayer = { name: "María", week: 24, avatar: "🤰" };
+        let multiPlayers = ["Mamá María (🤰)", "Mamá Sofía (🌸)"];
+        let currentTurnIdx = 0;
+
+        let selectedGameKey = 'puzzle';
+        let currentDifficulty = 'medium';
+
+        function updateModeHeaderUI() {
+            const modeIcon = document.getElementById('header-mode-icon');
+            const modeText = document.getElementById('header-mode-text');
+            const dashAvatar = document.getElementById('dash-mode-avatar');
+            const dashTitle = document.getElementById('dash-mode-title');
+            const dashSub = document.getElementById('dash-mode-subtitle');
+
+            if (modeType === 'personal') {
+                modeIcon.textContent = personalPlayer.avatar;
+                modeText.textContent = personalPlayer.name;
+                dashAvatar.textContent = personalPlayer.avatar;
+                dashTitle.textContent = "Modo Personal";
+                dashSub.textContent = `Gestante: ${personalPlayer.name} (Semana ${personalPlayer.week})`;
+            } else {
+                modeIcon.textContent = "👥";
+                modeText.textContent = `Grupo (${multiPlayers.length})`;
+                dashAvatar.textContent = "👥";
+                dashTitle.textContent = "Modo Multijugador Presencial";
+                dashSub.textContent = `${multiPlayers.length} Participantes en Taller`;
+            }
+
+            const activePlayerAvatar = document.getElementById('active-player-avatar');
+            const activePlayerName = document.getElementById('active-player-name');
+            if (modeType === 'personal') {
+                activePlayerAvatar.textContent = personalPlayer.avatar;
+                activePlayerName.textContent = `Gestante: ${personalPlayer.name}`;
+            } else {
+                const currentP = multiPlayers[currentTurnIdx] || multiPlayers[0];
+                activePlayerAvatar.textContent = "🎲";
+                activePlayerName.textContent = `Turno de: ${currentP}`;
+            }
+        }
+
+        function openModeConfigModal() {
+            document.getElementById('mode-config-modal').classList.remove('hidden');
+        }
+
+        function closeModeConfigModal() {
+            document.getElementById('mode-config-modal').classList.add('hidden');
+        }
+
+        function switchModeTab(tab) {
+            modeType = tab;
+            document.getElementById('tab-btn-personal').className = tab === 'personal' ? 'py-2.5 rounded-xl font-game text-xs font-bold transition bg-white text-rose-600 shadow-sm' : 'py-2.5 rounded-xl font-game text-xs font-bold transition text-slate-600';
+            document.getElementById('tab-btn-multi').className = tab === 'multi' ? 'py-2.5 rounded-xl font-game text-xs font-bold transition bg-white text-indigo-600 shadow-sm' : 'py-2.5 rounded-xl font-game text-xs font-bold transition text-slate-600';
+
+            document.getElementById('tab-content-personal').classList.toggle('hidden', tab !== 'personal');
+            document.getElementById('tab-content-multi').classList.toggle('hidden', tab !== 'multi');
+        }
+
+        function selectAvatar(av) {
+            personalPlayer.avatar = av;
+            document.querySelectorAll('.avatar-btn').forEach(b => b.className = "avatar-btn text-2xl p-2 bg-slate-100 border-2 border-slate-200 rounded-2xl");
+            event.currentTarget.className = "avatar-btn text-2xl p-2 bg-rose-50 border-2 border-rose-400 rounded-2xl";
+        }
+
+        function addMultiPlayerInput() {
+            const container = document.getElementById('multi-players-list');
+            if (container.children.length < 4) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'multi-name-input w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-2 text-xs font-bold';
+                input.value = `Participante ${container.children.length + 1}`;
+                container.appendChild(input);
+            }
+        }
+
+        function saveModeConfig() {
+            if (modeType === 'personal') {
+                personalPlayer.name = document.getElementById('input-player-name').value || "María";
+                personalPlayer.week = document.getElementById('input-player-week').value || 24;
+            } else {
+                const inputs = document.querySelectorAll('.multi-name-input');
+                multiPlayers = Array.from(inputs).map(inp => inp.value || "Participante");
+                currentTurnIdx = 0;
+            }
+            updateModeHeaderUI();
+            closeModeConfigModal();
+            SoundFX.playBeep(520, 'sine', 0.06);
+        }
+
+        function nextTurnPlayer() {
+            if (modeType === 'multi' && multiPlayers.length > 0) {
+                currentTurnIdx = (currentTurnIdx + 1) % multiPlayers.length;
+                updateModeHeaderUI();
+            }
+        }
+
+        // DATABASE OF METADATA
+        const GAME_METADATA = {
+            puzzle: { icon: "🧩", title: "1. Rompecabezas Nutritivo", desc: "Arma el plato rico en hierro hemo y vitamina C.", lore: "Junta las piezas de sangrecita y limonada antes de que venza el tiempo.", mythQ: "Mito: 'La remolacha cura la anemia.'", mythA: "Verdad: La sangrecita tiene 30 veces más hierro de alta absorción.", tip: "Combina carnes oscuras con vitamina C." },
+            ludo: { icon: "🎲", title: "2. Ludo de la Gestación", desc: "Recorre las semanas del embarazo evitando inhibidores.", lore: "Avanza semanas lanzando dados. Soporta varios participantes.", mythQ: "Mito: 'El suplemento engorda al bebé.'", mythA: "Verdad: El hierro previene parto prematuro y bajo peso.", tip: "Asiste puntualmente a tus controles prenatales." },
+            blocks: { icon: "🧊", title: "3. Nutri-Bloques Combo", desc: "Combina alimentos para elevar tu hemoglobina.", lore: "Logra súper combos entre hierro y cítricos.", mythQ: "Mito: 'Las espinacas superan a la carne.'", mythA: "Verdad: La sangrecita se absorbe hasta en un 30%.", tip: "Consume hierro hemo 3 veces por semana." },
+            pvz: { icon: "🥦", title: "4. Alimentos vs. Anemia", desc: "Defiende a la gestante frente a la fatiga.", lore: "Coloca defensas de sangrecita para proteger la salud.", mythQ: "Mito: 'Si me siento bien no necesito hierro.'", mythA: "Verdad: La anemia no siempre da síntomas al principio.", tip: "Acompaña el hierro con jugos cítricos." },
+            cars: { icon: "🏎️", title: "5. Rally Hemoglobina", desc: "Conduce recolectando cápsulas rojas de hierro.", lore: "Esquiva los vasos de café y té que bloquean el hierro.", mythQ: "Mito: 'Tomar la pastilla con leche ayuda.'", mythA: "Verdad: El calcio bloquea la absorción del hierro.", tip: "Evita lácteos con la pastilla de hierro." },
+            kitchen: { icon: "🍳", title: "6. Chef Materna Express", desc: "Sirve menús balanceados ricos en hierro.", lore: "Combina 1 hierro + 1 cítrico sin infusiones.", mythQ: "Mito: 'El limón destruye el hierro.'", mythA: "Verdad: La vitamina C potencia la absorción.", tip: "Agrega limón a ensaladas y menestras." },
+            memory: { icon: "🧠", title: "7. Memoria Mitos vs. Verdad", desc: "Empareja mitos con su aclaración científica.", lore: "Encuentra las parejas de cartas nutricionales.", mythQ: "Mito: 'El ácido fólico solo se toma días.'", mythA: "Verdad: Se requiere durante todo el proceso.", tip: "El ácido fólico y hierro protegen al bebé." },
+            trivia: { icon: "❓", title: "8. Desafío Trivia Mitos", desc: "Demuestra tu conocimiento en nutrición gestacional.", lore: "Supera preguntas clave de salud materna.", mythQ: "Mito: 'El hierro causa estreñimiento y debe dejarse.'", mythA: "Verdad: Se soluciona aumentando agua y fibra.", tip: "Consume frutas con cáscara y agua suficiente." },
+            platformer: { icon: "🏃‍♀️", title: "9. Super Mamá Antianemia", desc: "Salta obstáculos recolectando suplementos.", lore: "Avanza por las semanas del embarazo recolectando hierro.", mythQ: "Mito: 'La anemia solo le da a gente pobre.'", mythA: "Verdad: Puede afectar a cualquier embarazada.", tip: "Los requerimientos de hierro se duplican." },
+            snakes: { icon: "🪜", title: "10. Escalera del Hierro", desc: "Sube por decisiones saludables hacia la meta.", lore: "Llega al parto feliz. ¡Excelente para multijugador!", mythQ: "Mito: 'Comer sangrecita es antihigiénico.'", mythA: "Verdad: Es muy higiénica y nutritiva.", tip: "Aporta 29mg de hierro por cada 100g." }
+        };
+
+        const ALL_MYTHS = [
+            { q: "Mito: 'Tomar café después de comer no afecta.'", a: "VERDAD: El café bloquea hasta un 70% del hierro." },
+            { q: "Mito: 'El jugo de remolacha cura la anemia.'", a: "VERDAD: La sangrecita aporta 30 veces más hierro." },
+            { q: "Mito: 'El suplemento de hierro engorda al bebé.'", a: "VERDAD: Previene bajo peso al nacer." }
+        ];
+
+        function toggleMythGallery() {
+            const mg = document.getElementById('myth-gallery');
+            mg.classList.toggle('hidden');
+            const container = document.getElementById('myth-cards-container');
+            if (!mg.classList.contains('hidden') && container.children.length === 0) {
+                container.innerHTML = ALL_MYTHS.map((m, idx) => `
+                    <div class="bg-purple-800 border border-purple-600 rounded-2xl p-3 text-xs space-y-1">
+                        <span class="bg-amber-300 text-purple-950 px-2 py-0.5 rounded font-game font-bold text-[10px]">Mito #${idx+1}</span>
+                        <p class="font-bold text-amber-200">${m.q}</p>
+                        <p class="text-purple-100">${m.a}</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function showNotification(msg) {
+            const tipText = document.getElementById('tip-text');
+            if (tipText) tipText.textContent = msg;
+        }
+
+        function showDashboard() {
+            document.getElementById('dashboard-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            closeGameIntroModal();
+            if (window.currentGameInterval) clearInterval(window.currentGameInterval);
+        }
+
+        function openGameIntro(gameKey) {
+            selectedGameKey = gameKey;
+            const meta = GAME_METADATA[gameKey] || GAME_METADATA.puzzle;
+
+            document.getElementById('intro-icon').textContent = meta.icon;
+            document.getElementById('intro-title').textContent = meta.title;
+            document.getElementById('intro-lore').textContent = meta.lore;
+            document.getElementById('intro-myth-question').textContent = meta.mythQ;
+            document.getElementById('intro-myth-answer').textContent = meta.mythA;
+
+            selectDifficulty(currentDifficulty);
+            document.getElementById('game-intro-modal').classList.remove('hidden');
+            SoundFX.playBeep(450, 'sine', 0.05);
+        }
+
+        function closeGameIntroModal() {
+            document.getElementById('game-intro-modal').classList.add('hidden');
+        }
+
+        function selectDifficulty(diff) {
+            currentDifficulty = diff;
+            document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-amber-400'));
+            const selectedBtn = document.getElementById(`diff-btn-${diff}`);
+            if (selectedBtn) selectedBtn.classList.add('ring-4', 'ring-amber-400');
+        }
+
+        function confirmLaunchGame() {
+            closeGameIntroModal();
+            launchGame(selectedGameKey);
+        }
+
+        function launchGame(gameKey) {
+            document.getElementById('dashboard-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            updateModeHeaderUI();
+
+            const meta = GAME_METADATA[gameKey];
+            document.getElementById('game-icon-badge').textContent = meta.icon;
+            document.getElementById('current-game-title').textContent = meta.title;
+            document.getElementById('current-game-desc').textContent = meta.desc;
+            showNotification(meta.tip);
+
+            const container = document.getElementById('game-container');
+            container.innerHTML = '';
+
+            if (window.currentGameInterval) clearInterval(window.currentGameInterval);
+
+            switch (gameKey) {
+                case 'puzzle': setupPuzzleGame(container); break;
+                case 'ludo': setupLudoGame(container); break;
+                case 'blocks': setupBlocksGame(container); break;
+                case 'pvz': setupPvZGame(container); break;
+                case 'cars': setupCarsGame(container); break;
+                case 'kitchen': setupKitchenGame(container); break;
+                case 'memory': setupMemoryGame(container); break;
+                case 'trivia': setupTriviaGame(container); break;
+                case 'platformer': setupPlatformerGame(container); break;
+                case 'snakes': setupSnakesGame(container); break;
+            }
+        }
+
+        // GAME 1: PUZZLE
+        function setupPuzzleGame(container) {
+            let size = currentDifficulty === 'easy' ? 2 : 3;
+            let timerSeconds = currentDifficulty === 'easy' ? 90 : 50;
+            let total = size * size;
+            let tiles = Array.from({length: total}, (_, i) => i);
+            tiles.sort(() => Math.random() - 0.5);
+
+            const wrap = document.createElement('div');
+            wrap.className = "flex flex-col items-center gap-3 w-full max-w-sm";
+
+            const timerDisplay = document.createElement('div');
+            timerDisplay.className = "text-xs font-game font-bold bg-amber-100 text-amber-950 px-3 py-1 rounded-full border border-amber-300";
+            timerDisplay.textContent = `⏱️ Tiempo: ${timerSeconds}s`;
+            wrap.appendChild(timerDisplay);
+
+            const grid = document.createElement('div');
+            grid.className = `grid grid-cols-${size} gap-2 bg-slate-200 p-2.5 rounded-2xl w-full aspect-square border-2 border-slate-300`;
+
+            const foodItems = [
+                { name: "Sangrecita", icon: "🩸" }, { name: "Hígado", icon: "🥩" },
+                { name: "Bazo", icon: "🥩" }, { name: "Naranja", icon: "🍊" }
+            ];
+
+            const renderPuzzle = () => {
+                grid.innerHTML = '';
+                tiles.forEach((val, idx) => {
+                    const tile = document.createElement('div');
+                    if (val === 0) {
+                        tile.className = "bg-slate-300/80 rounded-xl border-2 border-dashed border-slate-400";
+                    } else {
+                        const item = foodItems[val - 1] || { name: 'Nutri', icon: '✨' };
+                        tile.className = "bg-rose-500 hover:bg-rose-600 text-white font-game font-bold rounded-xl flex flex-col items-center justify-center cursor-pointer shadow-md select-none p-2 text-center border-2 border-rose-400";
+                        tile.innerHTML = `<span class="text-xl">${item.icon}</span><span class="text-[10px] opacity-95">${item.name}</span>`;
+                    }
+                    tile.onclick = () => {
+                        SoundFX.playBeep(500, 'sine', 0.04);
+                        const emptyIdx = tiles.indexOf(0);
+                        const isAdjacent = [1, -1, size, -size].some(diff => {
+                            if (diff === 1 && idx % size === size - 1) return false;
+                            if (diff === -1 && idx % size === 0) return false;
+                            return idx + diff === emptyIdx;
+                        });
+                        if (isAdjacent) {
+                            [tiles[idx], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[idx]];
+                            renderPuzzle();
+                            checkWin();
+                        }
+                    };
+                    grid.appendChild(tile);
+                });
+            };
+
+            const checkWin = () => {
+                if (tiles.every((val, idx) => idx === tiles.length - 1 ? val === 0 : val === idx + 1)) {
+                    clearInterval(window.currentGameInterval);
+                    SoundFX.playWin(); triggerConfetti();
+                    showNotification("🎉 ¡Felicidades! Has completado el plato antianemia.");
+                    nextTurnPlayer();
+                }
+            };
+
+            const interval = setInterval(() => {
+                timerSeconds--;
+                timerDisplay.textContent = `⏱️ Tiempo: ${timerSeconds}s`;
+                if (timerSeconds <= 0) {
+                    clearInterval(interval); SoundFX.playError();
+                    showNotification("⏱️ ¡Tiempo agotado! Intenta reorganizar tus nutrientes.");
+                }
+            }, 1000);
+            window.currentGameInterval = interval;
+
+            renderPuzzle(); wrap.appendChild(grid); container.appendChild(wrap);
+        }
+
+        // GAME 2: LUDO DE LA GESTACIÓN
+        function setupLudoGame(container) {
+            let totalTiles = 16;
+            let playerPositions = modeType === 'multi' ? multiPlayers.map(() => 0) : [0];
+            let activeIdx = 0;
+
+            const wrap = document.createElement('div');
+            wrap.className = "flex flex-col items-center gap-4 w-full max-w-md";
+
+            const track = document.createElement('div');
+            track.className = `grid grid-cols-4 gap-2 w-full bg-indigo-50 p-3 rounded-2xl border-2 border-indigo-200`;
+
+            const updateBoard = () => {
+                track.innerHTML = '';
+                for (let i = 0; i < totalTiles; i++) {
+                    const tile = document.createElement('div');
+                    const playersHere = playerPositions.map((pos, pIdx) => pos === i ? pIdx : -1).filter(idx => idx !== -1);
+                    
+                    tile.className = `h-12 rounded-xl flex flex-col items-center justify-center font-bold text-xs border-2 transition ${
+                        playersHere.length > 0 ? 'bg-indigo-600 text-white border-indigo-900 shadow-md' : 'bg-white text-slate-700 border-slate-200'
+                    }`;
+
+                    if (playersHere.length > 0) {
+                        tile.innerHTML = `<span class="text-xs">S${i+1}</span><span class="text-[10px]">👤${playersHere.map(p => p+1).join(',')}</span>`;
+                    } else {
+                        tile.innerHTML = `S${i + 1}`;
+                    }
+                    track.appendChild(tile);
+                }
+            };
+
+            const status = document.createElement('p');
+            status.className = "text-xs font-semibold text-slate-700 text-center bg-slate-100 p-2.5 rounded-xl border border-slate-200 w-full";
+            status.textContent = modeType === 'multi' ? `Turno de: ${multiPlayers[activeIdx]}` : "Lanza el dado para avanzar por las semanas del embarazo.";
+
+            const diceBtn = document.createElement('button');
+            diceBtn.className = "bg-indigo-600 hover:bg-indigo-700 text-white font-game font-bold px-6 py-3 rounded-2xl shadow-lg transition flex items-center gap-2";
+            diceBtn.innerHTML = `🎲 Lanzar Dado`;
+
+            diceBtn.onclick = () => {
+                SoundFX.playBeep(600, 'square', 0.08);
+                const roll = Math.floor(Math.random() * 4) + 1;
+                playerPositions[activeIdx] = Math.min(playerPositions[activeIdx] + roll, totalTiles - 1);
+                updateBoard();
+
+                status.textContent = `${modeType === 'multi' ? multiPlayers[activeIdx] : 'Avanzaste'} ${roll} semanas. Casilla: S${playerPositions[activeIdx] + 1}.`;
+
+                if (playerPositions[activeIdx] >= totalTiles - 1) {
+                    SoundFX.playWin(); triggerConfetti();
+                    status.textContent = `🎉 ¡Felicidades ${modeType === 'multi' ? multiPlayers[activeIdx] : ''}! Llegaste a término con excelente hemoglobina.`;
+                } else {
+                    if (modeType === 'multi') {
+                        activeIdx = (activeIdx + 1) % multiPlayers.length;
+                        currentTurnIdx = activeIdx;
+                        updateModeHeaderUI();
+                    }
+                }
+            };
+
+            updateBoard(); wrap.appendChild(track); wrap.appendChild(status); wrap.appendChild(diceBtn); container.appendChild(wrap);
+        }
+
+        // GAME 3: NUTRI-BLOQUES
+        function setupBlocksGame(container) {
+            let hb = 10.0; const targetHb = 13.0;
+            const wrap = document.createElement('div');
+            wrap.className = "flex flex-col items-center gap-4 w-full max-w-md";
+
+            const barWrap = document.createElement('div');
+            barWrap.className = "w-full bg-slate-200 h-8 rounded-full overflow-hidden border-2 border-slate-300 shadow-inner relative";
+            const bar = document.createElement('div');
+            bar.className = "bg-gradient-to-r from-amber-500 to-rose-500 h-full transition-all duration-300 font-game font-bold text-xs text-white flex items-center justify-center";
+            bar.style.width = `${(hb / targetHb) * 100}%`;
+            bar.textContent = `${hb.toFixed(1)} g/dL (Meta: ${targetHb} g/dL)`;
+            barWrap.appendChild(bar);
+
+            const grid = document.createElement('div');
+            grid.className = "grid grid-cols-2 sm:grid-cols-3 gap-2.5 w-full";
+
+            const blocks = [
+                { name: 'Sangrecita', h: +0.8, color: 'bg-rose-500', icon: '🩸' },
+                { name: 'Naranja', h: +0.5, color: 'bg-orange-400', icon: '🍊' },
+                { name: 'Café (-)', h: -0.6, color: 'bg-stone-600', icon: '☕' },
+                { name: 'Hígado', h: +0.7, color: 'bg-red-700', icon: '🥩' },
+                { name: 'Ácido Fólico', h: +0.6, color: 'bg-emerald-500', icon: '💊' },
+                { name: 'Gaseosa (-)', h: -0.5, color: 'bg-slate-700', icon: '🥤' }
+            ];
+
+            blocks.forEach(b => {
+                const btn = document.createElement('button');
+                btn.className = `${b.color} text-white font-game font-bold p-3 rounded-2xl shadow-sm hover:opacity-95 transition flex flex-col items-center justify-center text-xs border border-white/30`;
+                btn.innerHTML = `<span class="text-xl">${b.icon}</span><span>${b.name}</span><span class="text-[9px]">${b.h > 0 ? '+' : ''}${b.h} Hb</span>`;
+                btn.onclick = () => {
+                    hb = Math.min(Math.max(hb + b.h, 6), targetHb);
+                    bar.style.width = `${(hb / targetHb) * 100}%`;
+                    bar.textContent = `${hb.toFixed(1)} g/dL (Meta: ${targetHb} g/dL)`;
+                    if (b.h > 0) SoundFX.playBeep(600, 'sine', 0.05);
+                    else SoundFX.playError();
+
+                    if (hb >= targetHb) {
+                        SoundFX.playWin(); triggerConfetti();
+                        showNotification("🎉 ¡Excelente! Has alcanzado el nivel óptimo de hemoglobina.");
+                        nextTurnPlayer();
+                    }
+                };
+                grid.appendChild(btn);
+            });
+
+            wrap.appendChild(barWrap); wrap.appendChild(grid); container.appendChild(wrap);
+        }
+
+        // GAME 4: PVZ
+        function setupPvZGame(container) {
+            const cvs = document.createElement('canvas');
+            cvs.width = 400; cvs.height = 200;
+            cvs.className = "rounded-2xl border-2 border-emerald-300 shadow-inner bg-emerald-50";
+            const ctx = cvs.getContext('2d');
+
+            let monster = { x: 380, y: 70, speed: 1.2 };
+            const loop = setInterval(() => {
+                ctx.clearRect(0, 0, cvs.width, cvs.height);
+                ctx.fillStyle = "#e11d48"; ctx.beginPath(); ctx.arc(40, 90, 18, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = "#fff"; ctx.font = "bold 9px sans-serif"; ctx.fillText("Sangrecita", 20, 94);
+
+                monster.x -= monster.speed;
+                ctx.fillStyle = "#475569"; ctx.fillRect(monster.x, 75, 40, 30);
+                ctx.fillStyle = "#fff"; ctx.font = "bold 9px sans-serif"; ctx.fillText("Fatiga", monster.x + 6, monster.y + 22);
+
+                if (monster.x < 70) {
+                    monster.x = 380; SoundFX.playBeep(300, 'square', 0.05);
+                    showNotification("🛡️ ¡Defensa exitosa! Sangrecita repelió la fatiga.");
+                }
+            }, 30);
+            window.currentGameInterval = loop; container.appendChild(cvs);
+        }
+
+        // GAME 5: RALLY
+        function setupCarsGame(container) {
+            const cvs = document.createElement('canvas');
+            cvs.width = 300; cvs.height = 260;
+            cvs.className = "rounded-2xl border-2 border-blue-400 bg-slate-800 shadow-inner";
+            const ctx = cvs.getContext('2d');
+            let carX = 125, score = 0;
+            let item = { x: 70, y: 0, type: 'iron' };
+
+            const draw = () => {
+                ctx.clearRect(0, 0, cvs.width, cvs.height);
+                ctx.fillStyle = "#3b82f6"; ctx.fillRect(carX, 200, 45, 40);
+                ctx.fillStyle = "#fff"; ctx.font = "bold 9px sans-serif"; ctx.fillText("Mamá", carX + 8, 224);
+
+                item.y += 3;
+                if (item.type === 'iron') {
+                    ctx.fillStyle = "#ef4444"; ctx.beginPath(); ctx.arc(item.x, item.y, 12, 0, Math.PI * 2); ctx.fill();
+                } else {
+                    ctx.fillStyle = "#78350f"; ctx.fillRect(item.x - 10, item.y - 10, 20, 20);
+                }
+
+                if (item.y > 190 && item.y < 240 && Math.abs(item.x - (carX + 20)) < 25) {
+                    if (item.type === 'iron') { score += 10; SoundFX.playBeep(700, 'sine', 0.05); }
+                    else { score = Math.max(score - 5, 0); SoundFX.playError(); }
+                    item.y = -40; item.x = Math.random() > 0.5 ? 70 : 200;
+                    item.type = Math.random() > 0.4 ? 'iron' : 'coffee';
+                }
+                if (item.y > 270) { item.y = -40; item.x = Math.random() > 0.5 ? 70 : 200; }
+                ctx.fillStyle = "#fff"; ctx.font = "bold 11px sans-serif"; ctx.fillText(`Hierro: ${score}`, 10, 20);
+            };
+            window.currentGameInterval = setInterval(draw, 30);
+
+            const btnWrap = document.createElement('div');
+            btnWrap.className = "flex gap-3 mt-2";
+            btnWrap.innerHTML = `
+                <button id="l-btn" class="bg-blue-600 text-white font-game font-bold px-4 py-2 rounded-xl text-xs">◀ Izquierda</button>
+                <button id="r-btn" class="bg-blue-600 text-white font-game font-bold px-4 py-2 rounded-xl text-xs">Derecha ▶</button>
+            `;
+            container.appendChild(cvs); container.appendChild(btnWrap);
+            document.getElementById('l-btn').onclick = () => carX = 50;
+            document.getElementById('r-btn').onclick = () => carX = 200;
+        }
+
+        // GAME 6: CHEF MATERNA
+        function setupKitchenGame(container) {
+            let plate = []; const wrap = document.createElement('div');
+            wrap.className = "flex flex-col items-center gap-3 w-full max-w-md";
+            const display = document.createElement('div');
+            display.className = "w-full min-h-[70px] bg-orange-50 border-2 border-dashed border-orange-300 rounded-2xl p-3 flex flex-wrap items-center justify-center gap-2 text-xs font-semibold text-orange-950";
+            display.textContent = "Plato vacío. Elige ingredientes:";
+
+            const opts = [
+                { name: 'Sangrecita', type: 'iron', img: '🥩' }, { name: 'Lentejas', type: 'side', img: '🍲' },
+                { name: 'Ensalada Limón', type: 'citrus', img: '🥗' }, { name: 'Té (Inhibidor)', type: 'bad', img: '☕' }
+            ];
+
+            const grid = document.createElement('div');
+            grid.className = "grid grid-cols-2 gap-2 w-full";
+            opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white border-2 border-slate-200 p-2.5 rounded-xl flex items-center gap-2 text-xs font-bold shadow-sm";
+                btn.innerHTML = `<span class="text-xl">${opt.img}</span> <span>${opt.name}</span>`;
+                btn.onclick = () => {
+                    SoundFX.playBeep(550, 'sine', 0.04); plate.push(opt);
+                    display.innerHTML = plate.map(p => `<span class="bg-orange-200 px-2 py-0.5 rounded-lg">${p.img} ${p.name}</span>`).join(' + ');
+                };
+                grid.appendChild(btn);
+            });
+
+            const serveBtn = document.createElement('button');
+            serveBtn.className = "bg-orange-500 text-white font-game font-bold py-2.5 rounded-2xl shadow-md w-full text-xs";
+            serveBtn.textContent = "Servir Menú Antianemia";
+            serveBtn.onclick = () => {
+                const hasIron = plate.some(p => p.type === 'iron' || p.type === 'side');
+                const hasCitrus = plate.some(p => p.type === 'citrus');
+                const hasBad = plate.some(p => p.type === 'bad');
+
+                if (hasBad) { SoundFX.playError(); showNotification("❌ ¡Inhibidor detectado! El té bloquea el hierro."); }
+                else if (hasIron && hasCitrus) {
+                    SoundFX.playWin(); triggerConfetti();
+                    showNotification("🎉 ¡Menú perfecto! Combinación ideal de hierro y Vitamina C.");
+                    nextTurnPlayer();
+                } else { SoundFX.playError(); showNotification("⚠️ Requiere al menos una fuente de hierro y un cítrico."); }
+                plate = []; display.textContent = "Plato servido. Diseña otro:";
+            };
+
+            wrap.appendChild(display); wrap.appendChild(grid); wrap.appendChild(serveBtn); container.appendChild(wrap);
+        }
+
+        // GAME 7: MEMORIA
+        function setupMemoryGame(container) {
+            let pool = [{ m: "🩸 Sangrecita", v: "Alto Hierro Hemo" }, { m: "🍊 Vitamina C", v: "Mejora Absorción" }, { m: "💊 Sulfato Ferroso", v: "Prevención Diaria" }];
+            let cardsData = []; pool.forEach(item => cardsData.push(item.m, item.v));
+            cardsData.sort(() => Math.random() - 0.5);
+
+            const grid = document.createElement('div');
+            grid.className = "grid grid-cols-3 gap-2.5 w-full max-w-xs";
+            let flipped = [], matched = 0;
+
+            cardsData.forEach(val => {
+                const card = document.createElement('div');
+                card.className = "bg-purple-600 text-white font-game font-bold rounded-2xl flex items-center justify-center text-xs text-center cursor-pointer p-3 shadow-sm aspect-square border-2 border-purple-400";
+                card.textContent = "?";
+
+                card.onclick = () => {
+                    if (flipped.length < 2 && !card.classList.contains('revealed')) {
+                        SoundFX.playBeep(450, 'sine', 0.04);
+                        card.textContent = val; card.classList.add('revealed', 'bg-purple-900');
+                        flipped.push({ card, val });
+
+                        if (flipped.length === 2) {
+                            const isPair = pool.some(p => (p.m === flipped[0].val && p.v === flipped[1].val) || (p.v === flipped[0].val && p.m === flipped[1].val));
+                            if (isPair) {
+                                SoundFX.playBeep(650, 'triangle', 0.1); matched += 2; flipped = [];
+                                if (matched === cardsData.length) {
+                                    SoundFX.playWin(); triggerConfetti();
+                                    showNotification("🎉 ¡Excelente memoria! Completaste las parejas.");
+                                    nextTurnPlayer();
+                                }
+                            } else {
+                                SoundFX.playError();
+                                setTimeout(() => {
+                                    flipped.forEach(f => { f.card.textContent = "?"; f.card.classList.remove('revealed', 'bg-purple-900'); });
+                                    flipped = [];
+                                }, 800);
+                            }
+                        }
+                    }
+                };
+                grid.appendChild(card);
+            });
+            container.appendChild(grid);
+        }
+
+        // GAME 8: TRIVIA
+        function setupTriviaGame(container) {
+            const triviaList = [
+                { q: "¿Con qué bebida tomar el suplemento de hierro?", opts: ["Jugo de naranja / Limonada", "Té helado", "Leche entera"], ans: 0 },
+                { q: "¿Cuál aporta mayor hierro hemo?", opts: ["Pechuga de pollo", "Sangrecita o Bazo", "Queso fresco"], ans: 1 }
+            ];
+            let qIdx = 0; const wrap = document.createElement('div');
+            wrap.className = "max-w-md w-full bg-cyan-50 p-5 rounded-3xl border-2 border-cyan-300 flex flex-col gap-3 shadow-sm";
+
+            const renderQ = () => {
+                wrap.innerHTML = ''; const q = triviaList[qIdx];
+                const qText = document.createElement('h3');
+                qText.className = "font-game text-sm font-bold text-slate-800";
+                qText.textContent = `${qIdx + 1}. ${q.q}`;
+                wrap.appendChild(qText);
+
+                q.opts.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left bg-white border-2 border-slate-200 p-2.5 rounded-xl font-semibold text-xs hover:bg-cyan-100 transition shadow-sm";
+                    btn.textContent = opt;
+                    btn.onclick = () => {
+                        if (idx === q.ans) { SoundFX.playWin(); showNotification("✅ ¡Correcto! La vitamina C mejora la absorción."); }
+                        else { SoundFX.playError(); showNotification("❌ La opción correcta es vitamina C."); }
+                        qIdx = (qIdx + 1) % triviaList.length;
+                        nextTurnPlayer();
+                        setTimeout(renderQ, 1200);
+                    };
+                    wrap.appendChild(btn);
+                });
+            };
+            renderQ(); container.appendChild(wrap);
+        }
+
+        // GAME 9: PLATAFORMAS
+        function setupPlatformerGame(container) {
+            const cvs = document.createElement('canvas');
+            cvs.width = 360; cvs.height = 180;
+            cvs.className = "rounded-2xl border-2 border-teal-300 shadow-inner bg-sky-100";
+            const ctx = cvs.getContext('2d');
+            let py = 120, vy = 0, isJumping = false, score = 0, itemX = 340;
+
+            cvs.onclick = () => {
+                if (!isJumping) { vy = -8; isJumping = true; SoundFX.playBeep(500, 'sine', 0.05); }
+            };
+
+            const loop = setInterval(() => {
+                vy += 0.5; py += vy;
+                if (py >= 120) { py = 120; isJumping = false; }
+                itemX -= 4; if (itemX < -20) itemX = 380;
+
+                if (itemX < 50 && itemX > 25 && py > 90) {
+                    score += 1; SoundFX.playBeep(750, 'sine', 0.05); itemX = 380;
+                }
+
+                ctx.clearRect(0, 0, cvs.width, cvs.height);
+                ctx.fillStyle = "#0d9488"; ctx.fillRect(0, 150, 360, 30);
+                ctx.fillStyle = "#f43f5e"; ctx.fillRect(30, py, 22, 30);
+                ctx.fillStyle = "#e11d48"; ctx.beginPath(); ctx.arc(itemX, 110, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = "#0f172a"; ctx.font = "bold 11px sans-serif"; ctx.fillText(`Cápsulas: ${score}`, 10, 20);
+            }, 30);
+            window.currentGameInterval = loop; container.appendChild(cvs);
+        }
+
+        // GAME 10: ESCALERA DEL HIERRO
+        function setupSnakesGame(container) {
+            let pos = 1; const maxPos = 20;
+            const wrap = document.createElement('div');
+            wrap.className = "flex flex-col items-center gap-3 text-center w-full max-w-xs";
+
+            const box = document.createElement('div');
+            box.className = "w-48 h-48 bg-pink-100 border-4 border-pink-300 rounded-3xl flex flex-col items-center justify-center gap-2 shadow-inner p-3";
+
+            const posText = document.createElement('div');
+            posText.className = "font-game text-3xl font-extrabold text-pink-600";
+            posText.textContent = `Casilla ${pos}`;
+
+            const descText = document.createElement('p');
+            descText.className = "text-[11px] font-semibold text-slate-700 leading-tight";
+            descText.textContent = "Gira la ruleta para avanzar.";
+
+            box.appendChild(posText); box.appendChild(descText);
+
+            const rollBtn = document.createElement('button');
+            rollBtn.className = "bg-pink-600 hover:bg-pink-700 text-white font-game font-bold px-6 py-2.5 rounded-2xl shadow-md text-xs";
+            rollBtn.textContent = "Girar Ruleta 🎲";
+
+            rollBtn.onclick = () => {
+                SoundFX.playBeep(550, 'triangle', 0.06);
+                const step = Math.floor(Math.random() * 4) + 1;
+                pos += step;
+
+                if (pos === 5 || pos === 12) {
+                    pos += 3; descText.textContent = "🪜 ¡Escalera! Tomaste sulfato ferroso diariamente (+3).";
+                } else if (pos === 8 || pos === 15) {
+                    pos = Math.max(pos - 2, 1); descText.textContent = "⚠️ ¡Resbalón! Olvidaste el cítrico (-2).";
+                } else {
+                    descText.textContent = `Avanzaste ${step} casillas.`;
+                }
+
+                if (pos >= maxPos) {
+                    pos = maxPos; SoundFX.playWin(); triggerConfetti();
+                    descText.textContent = "🎉 ¡Felicidades! Llegaste a la meta con salud óptima.";
+                } else {
+                    nextTurnPlayer();
+                }
+                posText.textContent = `Casilla ${pos}`;
+            };
+
+            wrap.appendChild(box); wrap.appendChild(rollBtn); container.appendChild(wrap);
+        }
+
+        window.onload = () => {
+            updateModeHeaderUI();
+            showDashboard();
+        };
+    </script>
+</body>
+</html>
